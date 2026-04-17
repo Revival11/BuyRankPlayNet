@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PlayNetwork SMP Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: white;
+            background: url('https://images.unsplash.com/photo-1627037553077-675f41bb5f96?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed;
+            background-size: cover;
+            line-height: 1.5;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.95) 100%);
+            z-index: -1;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 20px 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        /* PLATFORM & INPUT SECTION */
+        .selection-box {
+            max-width: 500px;
+            margin: 0 auto 30px;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .platform-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 5px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .platform-btn {
+            padding: 10px;
+            border-radius: 10px;
+            border: none;
+            background: transparent;
+            color: #94a3b8;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .platform-btn.active {
+            background: #38bdf8;
+            color: #0f172a;
+            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            color: white;
+            font-size: 1rem;
+            text-align: center;
+            outline: none;
+        }
+
+        input:focus { border-color: #38bdf8; }
+
+        /* GRID & CARDS */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 15px;
+            padding: 0 15px 100px;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .card {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            transition: 0.3s;
+        }
+
+        .card:active { transform: scale(0.98); }
+
+        /* HIGHLIGHT COLORS */
+        .card.mythic { border: 2px solid #a855f7; background: rgba(168, 85, 247, 0.1); }
+        .card.celestial { border: 2px solid #fbbf24; background: rgba(251, 191, 36, 0.1); }
+
+        .rank-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .title { font-size: 1.3rem; font-weight: 800; }
+        .price { 
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-weight: 700; 
+            font-size: 0.9rem; 
+        }
+
+        ul { list-style: none; margin-bottom: 20px; flex-grow: 1; }
+        li { font-size: 0.85rem; color: #cbd5e1; margin-bottom: 6px; display: flex; align-items: center; }
+        li::before { content: "•"; color: #38bdf8; margin-right: 8px; font-weight: bold; }
+
+        .buy-btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            background: #38bdf8;
+            color: #0f172a;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .mythic .title { color: #d8b4fe; }
+        .mythic .buy-btn { background: #a855f7; color: white; }
+        .celestial .title { color: #fbbf24; }
+        .celestial .buy-btn { background: #fbbf24; color: #451a03; }
+
+        @media (min-width: 768px) {
+            .grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        }
+        @media (min-width: 1024px) {
+            .grid { grid-template-columns: repeat(3, 1fr); }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>PlayNetwork</h1>
+        <p>Support PNet SMP dengan Rank Premium</p>
+    </div>
+
+    <div class="selection-box">
+        <div class="platform-selector">
+            <button class="platform-btn active" onclick="setPlatform('Java', this)">JAVA EDITION</button>
+            <button class="platform-btn" onclick="setPlatform('Bedrock', this)">BEDROCK</button>
+        </div>
+        <input type="text" id="username" placeholder="Username Minecraft" autocomplete="off">
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <div class="rank-info">
+                <div class="title">Warrior</div>
+                <div class="price">5K</div>
+            </div>
+            <ul>
+                <li>Semua No Rank</li>
+                <li>3 sethome</li>
+                <li>Akses /anvil, /craft, /ec</li>
+                <li>Kit & Prefix Warrior</li>
+            </ul>
+            <button class="buy-btn" onclick="buyRank('Warrior')">Beli</button>
+        </div>
+
+        <div class="card">
+            <div class="rank-info">
+                <div class="title">Slayer</div>
+                <div class="price">10K</div>
+            </div>
+            <ul>
+                <li>Semua Warrior</li>
+                <li>7 sethome</li>
+                <li>Akses /feed & /heal</li>
+                <li>Kit & Prefix Slayer</li>
+            </ul>
+            <button class="buy-btn" onclick="buyRank('Slayer')">Beli</button>
+        </div>
+
+        <div class="card">
+            <div class="rank-info">
+                <div class="title">Elite</div>
+                <div class="price">20K</div>
+            </div>
+            <ul>
+                <li>Semua Slayer</li>
+                <li>10 sethome</li>
+                <li>Akses /ptime</li>
+                <li>Kit & Prefix Elite</li>
+            </ul>
+            <button class="buy-btn" onclick="buyRank('Elite')">Beli</button>
+        </div>
+
+        <div class="card">
+            <div class="rank-info">
+                <div class="title">Emperor</div>
+                <div class="price">35K</div>
+            </div>
+            <ul>
+                <li>Semua Elite</li>
+                <li>15 sethome</li>
+                <li>Akses /nick & /hat</li>
+                <li>Kit & Prefix Emperor</li>
+            </ul>
+            <button class="buy-btn" onclick="buyRank('Emperor')">Beli</button>
+        </div>
+
+        <div class="card">
+            <div class="rank-info">
+                <div class="title">Lord</div>
+                <div class="price">50K</div>
+            </div>
+            <ul>
+                <li>Semua Emperor</li>
+                <li>20 sethome</li>
+                <li>Akses /speed & /jump</li>
+                <li>Kit & Prefix Lord</li>
+            </ul>
+            <button class="buy-btn" onclick="buyRank('Lord')">Beli</button>
+        </div>
+
+        <div class="card">
+            <div class="rank-info">
+                <div class="title">Overlord</div>
+                <div class="price">75K</div>
+            </div>
+            <ul>
+                <li>Semua Lord</li>
+                <li>Unlimited sethome</li>
+                <li>Akses /repair & /disposal</li>
+                <li>Kit & Prefix Overlord</li>
+            </ul>
+            <button class="buy-btn" onclick="buyRank('Overlord')">Beli</button>
+        </div>
+
+        <div class="card mythic">
+            <div class="rank-info">
+                <div class="title">Mythic</div>
+                <div class="price">120K</div>
+            </div>
+            <ul>
+                <li>Semua Overlord</li>
+                <li>Akses /fly (Terbatas)</li>
+                <li>Akses /near</li>
+                <li>Kit & Prefix Mythic</li>
+            </ul>
+            <button class="buy-btn" onclick="buyRank('Mythic')">Beli</button>
+        </div>
+
+        <div class="card celestial">
+            <div class="rank-info">
+                <div class="title">Celestial</div>
+                <div class="price">300K</div>
+            </div>
+            <ul>
+                <li>Semua Mythic</li>
+                <li>Akses /fly (Unlimited)</li>
+                <li>Bypass full server</li>
+                <li>Kit & Prefix Celestial</li>
+            </ul>
+            <button class="buy-btn" onclick="buyRank('Celestial')">Beli</button>
+        </div>
+    </div>
+
+    <script>
+        let selectedPlatform = "Java";
+
+        function setPlatform(platform, element) {
+            selectedPlatform = platform;
+            document.querySelectorAll('.platform-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        function buyRank(rank) {
+            const user = document.getElementById("username").value;
+            if(!user.trim()) {
+                alert("Masukkan username dulu!");
+                return;
+            }
+
+            const phone = "6281527114843";
+            const message = `Halo Admin PlayNetwork!\n\nSaya ingin beli rank: *${rank}*\nUsername: *${user}*\nPlatform: *${selectedPlatform}*\n\nMohon diproses ya, terima kasih!`;
+            const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+
+            window.open(url, '_blank');
+        }
+    </script>
+</body>
+</html>
